@@ -70,6 +70,26 @@
                                 SelectedValue="@SelectedResource"
                                 ViewKey="ResourcesList">
                 <Summary>
+                    <div class="resources-summary-layout">
+                        <div class="resource-tabs">
+                            @*
+                                Tab content isn't nested inside FluentTab elements. The tab control is just used to display the tabs.
+                                Content is located in manually created divs so they can be placed in their own CSS grid row.
+                            *@
+                            <FluentTabs Class="resources-tab-header" ActiveTabId="@($"tab-{PageViewModel.SelectedViewKind}")" OnTabChange="@OnTabChangeAsync">
+                                <FluentTab LabelClass="tab-label"
+                                           Id="@($"tab-{ResourceViewKind.Table}")"
+                                           Label="@ControlsStringsLoc[nameof(ControlsStrings.ChartContainerTableTab)]"
+                                           Icon="@(new Icons.Regular.Size24.Table())">
+                                </FluentTab>
+                                <FluentTab LabelClass="tab-label"
+                                           Id="@($"tab-{ResourceViewKind.Graph}")"
+                                           aria-label="@ControlsStringsLoc[nameof(ControlsStrings.ChartContainerGraphAccessibleLabel)]"
+                                           Label="@ControlsStringsLoc[nameof(ControlsStrings.ChartContainerGraphTab)]"
+                                           Icon="@(new Icons.Regular.Size24.ShareAndroid())">
+                                </FluentTab>
+                            </FluentTabs>
+                            <div class="resources-grid-container" hidden="@(PageViewModel.SelectedViewKind != ResourceViewKind.Table)">
                     @{
                         var gridTemplateColumns = HasResourcesWithCommands ? "1fr 1.5fr 1.25fr 1.5fr 2.5fr 2.5fr 1fr 1fr 1fr" : "1fr 1.5fr 1.25fr 1.5fr 2.5fr 2.5fr 1fr 1fr";
                     }
@@ -136,6 +156,13 @@
                             <FluentIcon Icon="Icons.Regular.Size24.AppGeneric" />&nbsp;@Loc[nameof(Dashboard.Resources.Resources.ResourcesNoResources)]
                         </EmptyContent>
                     </FluentDataGrid>
+                            </div>
+                            <div class="resource-graph-container" hidden="@(PageViewModel.SelectedViewKind != ResourceViewKind.Graph)">
+                                <svg class="resource-graph">
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
                 </Summary>
                 <Details>
                     <ResourceDetails Resource="context" ShowSpecOnlyToggle="true" />
