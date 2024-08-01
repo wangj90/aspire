@@ -1,7 +1,7 @@
 ; EditorConfig to support per-solution formatting.
 ; Use the EditorConfig VS add-in to make this work.
 ; http://editorconfig.org/
-;
+; 
 ; Here are some resources for what's supported for .NET/C#
 ; https://kent-boogaart.com/blog/editorconfig-reference-for-c-developers
 ; https://learn.microsoft.com/visualstudio/ide/editorconfig-code-style-settings-reference
