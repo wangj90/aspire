@@ -17,7 +17,6 @@ using Aspire.Dashboard.Otlp.Storage;
 using Aspire.Dashboard.Resources;
 using Aspire.Dashboard.Utils;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components.Extensions;
 using Microsoft.JSInterop;
@@ -44,7 +43,7 @@ public partial class Resources : ComponentBase, IAsyncDisposable, IPageWithSessi
     [Inject]
     public required IJSRuntime JS { get; init; }
     [Inject]
-    public required ProtectedSessionStorage SessionStorage { get; init; }
+    public required ISessionStorage SessionStorage { get; init; }
 
     public string BasePath => DashboardUrls.ResourcesBasePath;
     public string SessionStorageKey => "Resources_PageState";
