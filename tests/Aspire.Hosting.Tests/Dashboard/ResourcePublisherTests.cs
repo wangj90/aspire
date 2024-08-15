@@ -192,7 +192,8 @@ public class ResourcePublisherTests
             CreationTimeStamp = null,
             DisplayName = "",
             Urls = [],
-            Environment = []
+            Environment = [],
+            Relationships = []
         };
     }
 }

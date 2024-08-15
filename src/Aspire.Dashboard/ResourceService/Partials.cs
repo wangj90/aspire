@@ -27,6 +27,7 @@ partial class Resource
                 Properties = Properties.ToFrozenDictionary(property => ValidateNotNull(property.Name), property => ValidateNotNull(property.Value), StringComparers.ResourcePropertyName),
                 Environment = GetEnvironment(),
                 Urls = GetUrls(),
+                Relationships = GetRelationships(),
                 State = HasState ? State : null,
                 KnownState = HasState ? Enum.TryParse(State, out KnownResourceState knownState) ? knownState : null : null,
                 StateStyle = HasStateStyle ? StateStyle : null,
@@ -42,6 +43,13 @@ partial class Resource
         {
             return Environment
                 .Select(e => new EnvironmentVariableViewModel(e.Name, e.Value, e.IsFromSpec))
+                .ToImmutableArray();
+        }
+
+        ImmutableArray<RelationshipViewModel> GetRelationships()
+        {
+            return Relationships
+                .Select(r => new RelationshipViewModel(r.ResourceName, r.Type, r.Description))
                 .ToImmutableArray();
         }
 

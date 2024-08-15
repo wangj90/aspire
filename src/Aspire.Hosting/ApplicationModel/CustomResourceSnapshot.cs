@@ -44,6 +44,12 @@ public sealed record CustomResourceSnapshot
     /// The URLs that should show up in the dashboard for this resource.
     /// </summary>
     public ImmutableArray<UrlSnapshot> Urls { get; init; } = [];
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable RS0016 // Add public types and members to the declared API
+    public ImmutableArray<RelationshipSnapshot> Relationships { get; init; } = [];
+#pragma warning restore RS0016 // Add public types and members to the declared API
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }
 
 /// <summary>
@@ -76,6 +82,12 @@ public sealed record EnvironmentVariableSnapshot(string Name, string? Value, boo
 /// <param name="Url">The full uri.</param>
 /// <param name="IsInternal">Determines if this url is internal.</param>
 public sealed record UrlSnapshot(string Name, string Url, bool IsInternal);
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable RS0016 // Add public types and members to the declared API
+public sealed record RelationshipSnapshot(string ResourceName, string Type, string? Description);
+#pragma warning restore RS0016 // Add public types and members to the declared API
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
 /// <summary>
 /// A snapshot of the resource property.
@@ -149,4 +161,20 @@ public static class KnownResourceStates
     /// The finished state. Useful for showing the resource has finished.
     /// </summary>
     public static readonly string Finished = nameof(Finished);
+}
+
+internal static class ResourceSnapshotBuilder
+{
+    public static ImmutableArray<RelationshipSnapshot> BuildRelationships(IResource resource)
+    {
+        var relationships = ImmutableArray.CreateBuilder<RelationshipSnapshot>();
+
+        foreach (var annotation in resource.Annotations.OfType<ResourceRelationshipAnnotation>())
+        {
+            // TODO: Improve name
+            relationships.Add(new(annotation.Resource.Name, annotation.Type, annotation.Description));
+        }
+
+        return relationships.ToImmutable();
+    }
 }

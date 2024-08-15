@@ -21,6 +21,7 @@ public sealed class ResourceViewModel
     public required DateTime? CreationTimeStamp { get; init; }
     public required ImmutableArray<EnvironmentVariableViewModel> Environment { get; init; }
     public required ImmutableArray<UrlViewModel> Urls { get; init; }
+    public required ImmutableArray<RelationshipViewModel> Relationships { get; init; }
     public required FrozenDictionary<string, Value> Properties { get; init; }
     public required ImmutableArray<CommandViewModel> Commands { get; init; }
     public KnownResourceState? KnownState { get; init; }
@@ -112,5 +113,23 @@ public sealed class UrlViewModel
         Name = name;
         Url = url;
         IsInternal = isInternal;
+    }
+}
+
+[DebuggerDisplay("ResourceName = {ResourceName}, Type = {Type}, Description = {Description}")]
+public sealed class RelationshipViewModel
+{
+    public string ResourceName { get; }
+    public string Type { get; }
+    public string? Description { get; }
+
+    public RelationshipViewModel(string resourceName, string type, string? description)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(resourceName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(type);
+
+        ResourceName = resourceName;
+        Type = type;
+        Description = description;
     }
 }

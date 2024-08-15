@@ -109,6 +109,15 @@ message Url {
     bool is_internal = 3;
 }
 
+message ResourceRelationship {
+    // The name of the resource.
+    string resource_name = 1;
+    // The type of relationship.
+    string type = 2;
+    // Optional description.
+    optional string description = 3;
+}
+
 message ResourceProperty {
     // Name of the data item, e.g. "container.id", "executable.pid", "project.path", ...
     string name = 1;
@@ -140,13 +149,16 @@ message Resource {
     // - Projects: process_id, project_path
     repeated ResourceProperty properties = 12;
 
-    // The list of urls that this resource exposes
+    // The list of urls that this resource exposes.
     repeated Url urls = 13;
 
     // The style of the state. This is used to determine the state icon.
     // Supported styles are "success", "info", "warning" and "error". Any other style
     // will be treated as "unknown".
     optional string state_style = 14;
+
+    // The list of relationships for this resource.
+    repeated ResourceRelationship relationships = 15;
 }
 
 ////////////////////////////////////////////
