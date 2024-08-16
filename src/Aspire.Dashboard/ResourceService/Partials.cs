@@ -49,7 +49,7 @@ partial class Resource
         ImmutableArray<RelationshipViewModel> GetRelationships()
         {
             return Relationships
-                .Select(r => new RelationshipViewModel(r.ResourceName, r.Type, r.Description))
+                .Select(r => new RelationshipViewModel(r.ResourceName, r.Type))
                 .ToImmutableArray();
         }
 

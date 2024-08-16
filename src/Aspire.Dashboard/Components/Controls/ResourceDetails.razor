@@ -102,6 +102,29 @@
                     </AspireTemplateColumn>
                 </FluentDataGrid>
             </FluentAccordionItem>
+            <FluentAccordionItem Heading="@Loc[nameof(ControlsStrings.SpanDetailsBacklinksHeader)]" Expanded="true">
+                <div slot="end">
+                    <FluentBadge Appearance="Appearance.Neutral" Circular="true">
+                        @FilteredRelationships.Count()
+                    </FluentBadge>
+                </div>
+                <FluentDataGrid TGridItem="RelationshipViewModel"
+                                Items="@FilteredRelationships"
+                                Style="width:100%"
+                                GenerateHeader="GenerateHeaderOption.Sticky"
+                                GridTemplateColumns="2fr 1.5fr 1fr"
+                                ShowHover="true">
+                    <TemplateColumn Title="@Loc[nameof(ControlsStrings.SpanDetailsSpanColumnHeader)]">
+                        @context.ResourceName
+                    </TemplateColumn>
+                    <TemplateColumn Title="@Loc[nameof(ControlsStrings.SpanDetailsSpanColumnHeader)]">
+                        @context.Type
+                    </TemplateColumn>
+                    <TemplateColumn Title="@Loc[nameof(ControlsStrings.SpanDetailsDetailsColumnHeader)]">
+                        <FluentButton Appearance="Appearance.Lightweight" OnClick="@(() => OnViewDetailsAsync(context))">@Loc[nameof(ControlsStrings.ViewAction)]</FluentButton>
+                    </TemplateColumn>
+                </FluentDataGrid>
+            </FluentAccordionItem>
             <FluentAccordionItem Heading="@ControlStringsLoc[nameof(ControlsStrings.ResourceDetailsEnvironmentVariablesHeader)]" Expanded="true">
                 <div slot="end">
                     <FluentBadge Appearance="Appearance.Neutral" Circular="true">

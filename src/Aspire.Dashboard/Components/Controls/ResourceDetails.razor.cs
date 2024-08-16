@@ -44,6 +44,10 @@ public partial class ResourceDetails
         .Where(v => v.Name.Contains(_filter, StringComparison.CurrentCultureIgnoreCase) || v.Text.Contains(_filter, StringComparison.CurrentCultureIgnoreCase) == true)
         .AsQueryable();
 
+    private IQueryable<RelationshipViewModel> FilteredRelationships => GetRelationships()
+        .Where(v => v.ResourceName.Contains(_filter, StringComparison.CurrentCultureIgnoreCase) || v.Type.Contains(_filter, StringComparison.CurrentCultureIgnoreCase))
+        .AsQueryable();
+
     private IQueryable<SummaryValue> FilteredResourceValues => GetResourceValues()
         .Where(v => _showAll || v.KnownProperty != null)
         .Where(v => v.Key.Contains(_filter, StringComparison.CurrentCultureIgnoreCase) || v.Tooltip.Contains(_filter, StringComparison.CurrentCultureIgnoreCase))
@@ -110,6 +114,11 @@ public partial class ResourceDetails
         {
             vm.IsValueMasked = _areEnvironmentVariablesMasked;
         }
+    }
+
+    private IEnumerable<RelationshipViewModel> GetRelationships()
+    {
+        return Resource.Relationships;
     }
 
     private IEnumerable<DisplayedEndpoint> GetEndpoints()
@@ -213,6 +222,24 @@ public partial class ResourceDetails
             true when !foundUnmasked => true,
             _ => _areEnvironmentVariablesMasked
         };
+    }
+
+    public async Task OnViewDetailsAsync(RelationshipViewModel vm)
+    {
+        await Task.Yield();
+        //var available = await MetricsHelpers.WaitForSpanToBeAvailableAsync(
+        //    traceId: vm.TraceId,
+        //    spanId: vm.SpanId,
+        //    getSpan: TelemetryRepository.GetSpan,
+        //    DialogService,
+        //    InvokeAsync,
+        //    DialogsLoc,
+        //    _cts.Token).ConfigureAwait(false);
+
+        //if (available)
+        //{
+        //    NavigationManager.NavigateTo(DashboardUrls.TraceDetailUrl(vm.TraceId, spanId: vm.SpanId));
+        //}
     }
 
     private sealed class SummaryValue

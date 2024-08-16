@@ -85,7 +85,7 @@ public sealed record UrlSnapshot(string Name, string Url, bool IsInternal);
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable RS0016 // Add public types and members to the declared API
-public sealed record RelationshipSnapshot(string ResourceName, string Type, string? Description);
+public sealed record RelationshipSnapshot(string ResourceName, string Type, ImmutableDictionary<string, object> Properties);
 #pragma warning restore RS0016 // Add public types and members to the declared API
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
@@ -171,8 +171,7 @@ internal static class ResourceSnapshotBuilder
 
         foreach (var annotation in resource.Annotations.OfType<ResourceRelationshipAnnotation>())
         {
-            // TODO: Improve name
-            relationships.Add(new(annotation.Resource.Name, annotation.Type, annotation.Description));
+            relationships.Add(new(annotation.Resource.Name, annotation.Type, annotation.Properties.ToImmutableDictionary()));
         }
 
         return relationships.ToImmutable();

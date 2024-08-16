@@ -35,9 +35,20 @@ partial class Resource
             resource.Urls.Add(new Url { Name = url.Name, FullUrl = url.Url, IsInternal = url.IsInternal });
         }
 
-        foreach (var relationships in snapshot.Relationships)
+        foreach (var relationship in snapshot.Relationships)
         {
-            resource.Relationships.Add(new ResourceRelationship { ResourceName = relationships.ResourceName, Type = relationships.Type, Description = relationships.Description ?? string.Empty });
+            var r = new ResourceRelationship
+            {
+                ResourceName = relationship.ResourceName,
+                Type = relationship.Type
+            };
+            foreach (var property in relationship.Properties)
+            {
+                // TODO: Improve converting object to Value.
+                r.Properties.Add(new ResourceProperty { Name = property.Key, Value = Value.ForString(property.Value.ToString()) });
+            }
+
+            resource.Relationships.Add(r);
         }
 
         foreach (var property in snapshot.Properties)

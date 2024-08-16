@@ -116,20 +116,18 @@ public sealed class UrlViewModel
     }
 }
 
-[DebuggerDisplay("ResourceName = {ResourceName}, Type = {Type}, Description = {Description}")]
+[DebuggerDisplay("ResourceName = {ResourceName}, Type = {Type}")]
 public sealed class RelationshipViewModel
 {
     public string ResourceName { get; }
     public string Type { get; }
-    public string? Description { get; }
 
-    public RelationshipViewModel(string resourceName, string type, string? description)
+    public RelationshipViewModel(string resourceName, string type)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(resourceName);
         ArgumentException.ThrowIfNullOrWhiteSpace(type);
 
         ResourceName = resourceName;
         Type = type;
-        Description = description;
     }
 }

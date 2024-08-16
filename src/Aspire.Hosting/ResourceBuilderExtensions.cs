@@ -110,7 +110,7 @@ public static class ResourceBuilderExtensions
     /// <returns>A resource configured with the environment variable callback.</returns>
     public static IResourceBuilder<T> WithEnvironment<T>(this IResourceBuilder<T> builder, string name, EndpointReference endpointReference) where T : IResourceWithEnvironment
     {
-        builder.WithRelationship(builder.Resource, "Endpoint", endpointReference.EndpointName);
+        builder.WithRelationship(builder.Resource, "Endpoint");
 
         return builder.WithEnvironment(context =>
         {
@@ -279,7 +279,7 @@ public static class ResourceBuilderExtensions
         var resource = source.Resource;
         connectionName ??= resource.Name;
 
-        builder.WithRelationship(resource, "ConnectionString", connectionName);
+        builder.WithRelationship(resource, "ConnectionString");
 
         return builder.WithEnvironment(context =>
         {
@@ -347,7 +347,7 @@ public static class ResourceBuilderExtensions
     private static void ApplyEndpoints<T>(this IResourceBuilder<T> builder, IResourceWithEndpoints resourceWithEndpoints, string? endpointName = null)
         where T : IResourceWithEnvironment
     {
-        builder.WithRelationship(resourceWithEndpoints, "Endpoint", endpointName);
+        builder.WithRelationship(resourceWithEndpoints, "Endpoint");
 
         // When adding an endpoint we get to see whether there is an EndpointReferenceAnnotation
         // on the resource, if there is then it means we have already been here before and we can just
@@ -561,10 +561,9 @@ public static class ResourceBuilderExtensions
     public static IResourceBuilder<T> WithRelationship<T>(
         this IResourceBuilder<T> builder,
         IResource resource,
-        string type,
-        string? description = null) where T : IResource
+        string type) where T : IResource
     {
-        return builder.WithAnnotation(new ResourceRelationshipAnnotation(resource, "Endpoint", description));
+        return builder.WithAnnotation(new ResourceRelationshipAnnotation(resource, type));
     }
 #pragma warning restore RS0016 // Add public types and members to the declared API
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

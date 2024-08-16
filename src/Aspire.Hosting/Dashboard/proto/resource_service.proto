@@ -114,8 +114,8 @@ message ResourceRelationship {
     string resource_name = 1;
     // The type of relationship.
     string type = 2;
-    // Optional description.
-    optional string description = 3;
+    // Properties holding data not modeled directly on the message.
+    repeated ResourceProperty properties = 3;
 }
 
 message ResourceProperty {
