@@ -1,7 +1,9 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Collections.Concurrent;
 using System.Globalization;
+using Aspire.Dashboard.Extensions;
 using Aspire.Dashboard.Model;
 using Aspire.Dashboard.Utils;
 using Google.Protobuf.WellKnownTypes;
@@ -17,6 +19,9 @@ public partial class ResourceDetails
     public required ResourceViewModel Resource { get; set; }
 
     [Parameter]
+    public required ConcurrentDictionary<string, ResourceViewModel> ResourceByName { get; set; }
+
+    [Parameter]
     public bool ShowSpecOnlyToggle { get; set; }
 
     [Inject]
@@ -27,6 +32,9 @@ public partial class ResourceDetails
 
     [Inject]
     public required BrowserTimeProvider TimeProvider { get; init; }
+
+    [Inject]
+    public required NavigationManager NavigationManager { get; init; }
 
     private bool IsSpecOnlyToggleDisabled => !Resource.Environment.All(i => !i.FromSpec) && !GetResourceValues().Any(v => v.KnownProperty == null);
 
@@ -44,8 +52,12 @@ public partial class ResourceDetails
         .Where(v => v.Name.Contains(_filter, StringComparison.CurrentCultureIgnoreCase) || v.Text.Contains(_filter, StringComparison.CurrentCultureIgnoreCase) == true)
         .AsQueryable();
 
-    private IQueryable<RelationshipViewModel> FilteredRelationships => GetRelationships()
-        .Where(v => v.ResourceName.Contains(_filter, StringComparison.CurrentCultureIgnoreCase) || v.Type.Contains(_filter, StringComparison.CurrentCultureIgnoreCase))
+    private IQueryable<ResourceDetailRelationship> FilteredRelationships => GetRelationships()
+        .Where(v => v.Resource.DisplayName.Contains(_filter, StringComparison.CurrentCultureIgnoreCase) || v.Type.Contains(_filter, StringComparison.CurrentCultureIgnoreCase))
+        .AsQueryable();
+
+    private IQueryable<ResourceDetailRelationship> FilteredBackRelationships => GetBackRelationships()
+        .Where(v => v.Resource.DisplayName.Contains(_filter, StringComparison.CurrentCultureIgnoreCase) || v.Type.Contains(_filter, StringComparison.CurrentCultureIgnoreCase))
         .AsQueryable();
 
     private IQueryable<SummaryValue> FilteredResourceValues => GetResourceValues()
@@ -116,9 +128,66 @@ public partial class ResourceDetails
         }
     }
 
-    private IEnumerable<RelationshipViewModel> GetRelationships()
+    private IEnumerable<ResourceDetailRelationship> GetRelationships()
     {
-        return Resource.Relationships;
+        if (ResourceByName == null)
+        {
+            return [];
+        }
+
+        var items = new List<ResourceDetailRelationship>();
+
+        foreach (var relationship in Resource.Relationships)
+        {
+            var matches = ResourceByName.Values
+                .Where(r => string.Equals(r.DisplayName, relationship.ResourceName, StringComparisons.ResourceName))
+                .Where(r => !r.IsHiddenState())
+                .ToList();
+
+            foreach (var match in matches)
+            {
+                items.Add(new()
+                {
+                    Resource = match,
+                    ResourceName = ResourceViewModel.GetResourceName(match, ResourceByName),
+                    Type = relationship.Type
+                });
+            }
+        }
+
+        return items;
+    }
+
+    private IEnumerable<ResourceDetailRelationship> GetBackRelationships()
+    {
+        if (ResourceByName == null)
+        {
+            return [];
+        }
+
+        var items = new List<ResourceDetailRelationship>();
+
+        var otherResources = ResourceByName.Values
+            .Where(r => r != Resource)
+            .Where(r => !r.IsHiddenState());
+
+        foreach (var otherResource in otherResources)
+        {
+            foreach (var relationship in otherResource.Relationships)
+            {
+                if (string.Equals(relationship.ResourceName, Resource.DisplayName, StringComparisons.ResourceName))
+                {
+                    items.Add(new()
+                    {
+                        Resource = otherResource,
+                        ResourceName = ResourceViewModel.GetResourceName(otherResource, ResourceByName),
+                        Type = relationship.Type
+                    });
+                }
+            }
+        }
+
+        return items.OrderBy(r => r.ResourceName);
     }
 
     private IEnumerable<DisplayedEndpoint> GetEndpoints()
@@ -224,22 +293,10 @@ public partial class ResourceDetails
         };
     }
 
-    public async Task OnViewDetailsAsync(RelationshipViewModel vm)
+    public Task OnViewRelationshipAsync(ResourceDetailRelationship relationship)
     {
-        await Task.Yield();
-        //var available = await MetricsHelpers.WaitForSpanToBeAvailableAsync(
-        //    traceId: vm.TraceId,
-        //    spanId: vm.SpanId,
-        //    getSpan: TelemetryRepository.GetSpan,
-        //    DialogService,
-        //    InvokeAsync,
-        //    DialogsLoc,
-        //    _cts.Token).ConfigureAwait(false);
-
-        //if (available)
-        //{
-        //    NavigationManager.NavigateTo(DashboardUrls.TraceDetailUrl(vm.TraceId, spanId: vm.SpanId));
-        //}
+        NavigationManager.NavigateTo(DashboardUrls.ResourcesUrl(resource: relationship.Resource.Name));
+        return Task.CompletedTask;
     }
 
     private sealed class SummaryValue
@@ -251,4 +308,11 @@ public partial class ResourceDetails
     }
 
     private sealed record KnownProperty(string Key, string DisplayName);
+}
+
+public sealed class ResourceDetailRelationship
+{
+    public required ResourceViewModel Resource { get; init; }
+    public required string ResourceName { get; init; }
+    public required string Type { get; set; }
 }
