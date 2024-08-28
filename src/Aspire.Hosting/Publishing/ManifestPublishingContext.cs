@@ -179,9 +179,13 @@ public sealed class ManifestPublishingContext(DistributedApplicationExecutionCon
 
     private async Task WriteDeploymentTarget(DeploymentTargetAnnotation deploymentTarget)
     {
-        Writer.WriteStartObject("deployment");
-        await WriteResourceAsync(deploymentTarget.DeploymentTarget).ConfigureAwait(false);
-        Writer.WriteEndObject();
+        if (deploymentTarget.DeploymentTarget.TryGetLastAnnotation<ManifestPublishingCallbackAnnotation>(out var manifestPublishingCallbackAnnotation) &&
+            manifestPublishingCallbackAnnotation.Callback is not null)
+        {
+            Writer.WriteStartObject("deployment");
+            await manifestPublishingCallbackAnnotation.Callback(this).ConfigureAwait(false);
+            Writer.WriteEndObject();
+        }
     }
 
     private async Task WriteExecutableAsync(ExecutableResource executable)

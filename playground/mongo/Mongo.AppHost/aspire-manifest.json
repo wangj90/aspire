@@ -4,20 +4,16 @@
     "mongo": {
       "type": "container.v1",
       "deployment": {
-        "mongo-containerApp": {
-          "type": "azure.bicep.v0",
-          "path": "mongo-containerapp.module.bicep"
-        }
+        "type": "azure.bicep.v0",
+        "path": "mongo-containerapp.module.bicep"
       }
     },
     "api": {
       "type": "project.v1",
       "path": "../Mongo.ApiService/Mongo.ApiService.csproj",
       "deployment": {
-        "api-containerApp": {
-          "type": "azure.bicep.v0",
-          "path": "api-containerapp.module.bicep"
-        }
+        "type": "azure.bicep.v0",
+        "path": "api-containerapp.module.bicep"
       }
     }
   }
