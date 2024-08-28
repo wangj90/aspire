@@ -1,15 +1,18 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using Aspire.Hosting.Azure;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var db = builder.AddMongoDB("mongo")
     .WithMongoExpress(c => c.WithHostPort(3022))
-    .PublishAsContainer();
+    .PublishAsContainerApp();
 
 builder.AddProject<Projects.Mongo_ApiService>("api")
        .WithExternalHttpEndpoints()
-       .WithReference(db);
+       .WithReference(db)
+       .PublishAsContainerApp();
 
 #if !SKIP_DASHBOARD_REFERENCE
 // This project is only added in playground projects to support development/debugging
