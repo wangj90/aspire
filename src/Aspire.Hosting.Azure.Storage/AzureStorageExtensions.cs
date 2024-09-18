@@ -8,8 +8,8 @@ using Aspire.Hosting.Utils;
 using Azure.Identity;
 using Azure.Provisioning;
 using Azure.Provisioning.Storage;
-using Azure.ResourceManager.Storage.Models;
 using Azure.Storage.Blobs;
+using Microsoft.Extensions.DependencyInjection;
 //using Microsoft.Extensions.DependencyInjection;
 
 namespace Aspire.Hosting;
@@ -214,14 +214,14 @@ public static class AzureStorageExtensions
             blobServiceClient = CreateBlobServiceClient(connectionString);
         });
 
-        //var healthCheckKey = $"{name}_blob_check";
-        //builder.ApplicationBuilder.Services.AddHealthChecks().AddAzureBlobStorage(sp =>
-        //{
-        //    return blobServiceClient ?? throw new InvalidOperationException("BlobServiceClient is not initialized.");
-        //}, name: healthCheckKey);
+        var healthCheckKey = $"{name}_blob_check";
+        builder.ApplicationBuilder.Services.AddHealthChecks().AddAzureBlobStorage(sp =>
+        {
+            return blobServiceClient ?? throw new InvalidOperationException("BlobServiceClient is not initialized.");
+        }, name: healthCheckKey);
 
-        return builder.ApplicationBuilder.AddResource(resource);
-//                                         .WithHealthCheck(healthCheckKey);
+        return builder.ApplicationBuilder.AddResource(resource)
+                                         .WithHealthCheck(healthCheckKey);
 
         static BlobServiceClient CreateBlobServiceClient(string connectionString)
         {
